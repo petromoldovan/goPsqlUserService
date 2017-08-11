@@ -6,6 +6,8 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"encoding/json"
+	"log"
+	"os"
 )
 
 var db *sql.DB
@@ -27,9 +29,16 @@ func init() {
 	}
 
 	if err = db.Ping(); err != nil {
-		panic(err)
+		log.Println("Cannot connect to db", err)
 	}
 	fmt.Println("db connected")
+
+	//create log file
+	nf, err := os.Create("log.txt")
+	if err != nil {
+		log.Println("Cannot crete log file")
+	}
+	log.SetOutput(nf)
 }
 
 func main() {
@@ -47,6 +56,7 @@ func main() {
 func usersShow(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+		log.Println(http.StatusText(405), r.Method)
 		return
 	}
 
@@ -92,6 +102,7 @@ func usersShow(w http.ResponseWriter, r *http.Request) {
 func userShowByID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, http.StatusText(511), http.StatusMethodNotAllowed)
+		log.Println(http.StatusText(405), r.Method)
 		return
 	}
 
@@ -122,6 +133,8 @@ func userShowByID(w http.ResponseWriter, r *http.Request) {
 func userCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+		log.Println(http.StatusText(405), r.Method)
+		return
 	}
 
 	newUser := &User{}
@@ -144,6 +157,8 @@ func userCreate(w http.ResponseWriter, r *http.Request) {
 func userUpdate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+		log.Println(http.StatusText(405), r.Method)
+		return
 	}
 
 	newUser := &User{}
@@ -166,6 +181,8 @@ func userUpdate(w http.ResponseWriter, r *http.Request) {
 func userDelete(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+		log.Println(http.StatusText(405), r.Method)
+		return
 	}
 
 	id := r.FormValue("id")
