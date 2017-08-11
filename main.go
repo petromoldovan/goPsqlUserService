@@ -6,19 +6,17 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"encoding/json"
-	"strconv"
-	"os"
 )
 
 var db *sql.DB
 
 type User struct {
-	ID 				int
-	FirstName 		string		`json:"first_name"`
-	Surname			string		`json:"surname"`
-	PhoneNumber		string		`json:"phone_number"`
-	Email			string		`json:"email"`
-	isActive		bool
+	ID 					int			`json:"id"`
+	FirstName 			string		`json:"first_name"`
+	Surname				string		`json:"surname"`
+	PhoneNumber			string		`json:"phone_number"`
+	Email				string		`json:"email"`
+	isActive			bool
 }
 
 func init() {
@@ -110,17 +108,16 @@ func userShowByID(w http.ResponseWriter, r *http.Request) {
 
 	err := row.Scan(&user.ID, &user.FirstName, &user.Surname, &user.PhoneNumber, &user.Email, &user.isActive)
 	switch {
-		case err == sql.ErrNoRows:
-			http.NotFound(w, r)
-			return
-		case err != nil:
-			http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-			return
+	case err == sql.ErrNoRows:
+		http.NotFound(w, r)
+		return
+	case err != nil:
+		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+		return
 	}
 
 	json.NewEncoder(w).Encode(user)
 }
-
 
 func userCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -128,10 +125,7 @@ func userCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newUser := &User{}
-	newUser.FirstName = r.FormValue("firstName")
-	newUser.Surname = r.FormValue("surname")
-	newUser.PhoneNumber = r.FormValue("phone")
-	newUser.Email = r.FormValue("email")
+	json.NewDecoder(r.Body).Decode(&newUser)
 
 	if newUser.FirstName == "" || newUser.Surname == "" || newUser.PhoneNumber == "" || newUser.Email == "" {
 		http.Error(w, http.StatusText(400), http.StatusBadRequest)
@@ -153,20 +147,7 @@ func userUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newUser := &User{}
-	newUser.FirstName = r.FormValue("firstName")
-	newUser.Surname = r.FormValue("surname")
-	newUser.PhoneNumber = r.FormValue("phone")
-	newUser.Email = r.FormValue("email")
-
-
-	id := r.FormValue("id")
-	idInt, errConv := strconv.Atoi(id)
-	if errConv != nil {
-		// handle error
-		fmt.Println(errConv)
-		os.Exit(2)
-	}
-	newUser.ID = int(idInt)
+	json.NewDecoder(r.Body).Decode(&newUser)
 
 	if newUser.FirstName == "" || newUser.Surname == "" || newUser.PhoneNumber == "" || newUser.Email == "" {
 		http.Error(w, http.StatusText(400), http.StatusBadRequest)
@@ -201,20 +182,3 @@ func userDelete(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("user deleted", id)
 }
-
-/*func userCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-	}
-
-	newUser := make(map[string]interface{})
-
-	//get data
-	json.NewDecoder(r.Body).Decode(&newUser)
-	fmt.Println(newUser)
-
-	for key, v := range newUser {
-		fmt.Println(key)
-		fmt.Println(v)
-	}
-}*/
