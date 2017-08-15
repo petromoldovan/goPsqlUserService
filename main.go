@@ -13,11 +13,11 @@ import (
 var db *sql.DB
 
 type User struct {
-	ID 						int				`json:"id"`
-	FirstName 		string		`json:"first_name"`
+	ID 					int			`json:"id"`
+	FirstName 			string		`json:"first_name"`
 	Surname				string		`json:"surname"`
-	PhoneNumber		string		`json:"phone_number"`
-	Email					string		`json:"email"`
+	PhoneNumber			string		`json:"phone_number"`
+	Email				string		`json:"email"`
 	isActive			bool
 }
 
